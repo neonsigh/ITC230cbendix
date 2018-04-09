@@ -1,0 +1,19 @@
+{
+  "name": "itc230bendix",
+  "version": "1.0.0",
+  "description": "Bendix Node.js setup for itc230",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neonsigh/ITC230cbendix.git"
+  },
+  "author": "C Bendix",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neonsigh/ITC230cbendix/issues"
+  },
+  "homepage": "https://github.com/neonsigh/ITC230cbendix#readme"
+}
