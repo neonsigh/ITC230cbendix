@@ -1,0 +1,17 @@
+<html>
+<body>
+  <h2>Details for {{title}}</h2>
+  {{#if result}}
+    <li>Title: {{ result.title }}
+    <li>Artist: {{ result.artist }}
+    <li>Label: {{ result.label }}
+    <p>
+      <a href="/delete?title={{result.title}}">Delete this item</a>
+    </p>
+  {{else}}
+    {{title}} not found
+  {{/if}}
+  
+  <p><a href="../">Go home</a></p>
+</body>
+</html>

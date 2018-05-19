@@ -1,44 +1,74 @@
-var http = require("http"), fs = require("fs"), qs = require("querystring"); 
+let http = require("http"), fs = require("fs"), qs = require("querystring"); 
 let albums = require("./albums.js");
+'use strict'
+const express = require("express");
+const hbars = require("express-handlebars");
+const app = express();
+app.set('port', process.env.PORT || 3000);
+app.engine(".html", hbars({extname: '.html'}));
+app.set("view engine", ".html");
+
+app.use(express.static(__dirname + '/public')); // set location for static files
+app.use(require("body-parser").urlencoded({extended: true})); // parse form submissions
 
 
-http.createServer(function(req,res) {
-  var query = req.url.toLowerCase().split("?");
-  console.log(query);
-  var path = query[0]; // part before the ?
-  var title = decodeURI((query[1]) ? query[1].split("=")[1] : '');
+app.get('/', (req, res) => {
+ res.render('home', { 
+                      albums: albums.getAll 
+             });
+});
+
+app.post('/get', (req, res) => {
+  console.log(req.body); // display parsed form submission
+});
+
+app.get('/detail', (req,res) => {
+ let found = albums.get(req.query.title);
+ res.render('detail', {
+                        title: req.query.title, 
+                        artist: req.query.artist, 
+                        label: req.query.label, 
+                        result: found,
+                        albums: albums.getAll()
+             });
+});
+
+app.post('/detail', (req,res) => {
+ let result = albums.get(req.body.title);
+ res.render('detail', {
+                        title: req.body.title, 
+                        artist: req.body.artist, 
+                        label: req.body.label, 
+                        result: result 
+             });
+});
 
 
-  switch(path) {
-    case '/':
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('Home page');
-      break;
-    case '/about':
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('About page');
-      break;
-    case '/getall':
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('All albums: ' + JSON.stringify(albums.getAll()));
-      break; 
-    case '/get':
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('Searched for: ' + JSON.stringify(albums.get(title)));
-      break;  
-    case '/delete':
-      var deleted = albums.delete(title); // note that title is lowercase
-      if (deleted) {
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('Album ' + title + ' removed');
-      } else {
-      res.writeHead(200, {'Content-Type': 'text/plain'});  
-      res.end('Album ' + title + ' not removed');
-      }
-      break;
-    default:
-      res.writeHead(404, {'Content-Type': 'text/plain'});
-      res.end('Not found');
-      break;
-    }
-}).listen(process.env.PORT || 3000);
+app.get('/delete', (req,res) => {
+ res.type('text/html')
+ let result = albums.delete(req.query.title);
+ res.render('delete', {
+                        title: req.query.title, 
+                        result: result,
+                        found: res.locals.found,
+                        count: albums.getCount()
+             });
+});
+
+
+app.get('/about', (req, res) => {
+ res.type('text/plain');
+ res.send('About page');
+});
+
+
+app.use( (req,res) => {
+ res.type('text/plain'); 
+ res.status(404);
+ res.send('404 - Not found');
+});
+
+app.listen(app.get('port'), () => {
+ console.log('Express started'); 
+});
+

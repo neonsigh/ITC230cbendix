@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>Title Search</title> 
+
+    </head>
+    <body>
+        <h2>
+            Search for album title:
+        </h2>
+        <form method="GET" action="/detail">
+          <div>
+            <input type="search" id="mySearch" name="title" placeholder="title">
+            <button>Search</button>
+          </div>
+        </form>
+        
+        <p>
+        <h2>Album index</h2>
+    
+            {{#each albums}}
+            <li><a href="/detail?title={{title}}">{{title}}</a></li>
+            {{/each}}
+        
+        </p>
+    </body>
+</html>

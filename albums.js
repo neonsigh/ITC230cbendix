@@ -12,6 +12,10 @@ exports.getAll = () => {
     return albums;
 };
 
+exports.getCount = () => {
+    return albums.length;
+};
+
 exports.get = (title) => {
     return albums.find((album) => {
         return album.title.toLowerCase() === title.toLowerCase();
@@ -28,4 +32,21 @@ exports.delete = (title) => {
         } else {
              return false;
         }
+};
+
+exports.add = (newArtist, newTitle, newLabel) => {
+    let newAlbum = this.get(newArtist, newTitle, newLabel);
+    if (!newAlbum) {
+        albums.push(newArtist, newTitle, newLabel);
+        console.log("New album added");
+        return {
+            artist: newArtist,
+            title: newTitle,
+            label: newLabel
+        };
+    } else {
+        console.log("Album already exists");
+        return false;
+    }
+    
 };
