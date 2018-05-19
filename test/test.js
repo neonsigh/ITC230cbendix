@@ -31,27 +31,5 @@ describe("Albums module", () => {
         expect(addResult).to.equal;
     });
     
-    
-
-
-/*
-    
-
-    it("fails add new book because its already existed ", () => {
-        var addResult = book.add(Number(8), "Harry Potter Stone", 2007);
-        expect(addResult).to.equal;
-    });
-
-    it("returns deleted book ", () => {
-        var deleteResult = book.delete(Number(2));
-        expect(deleteResult).to.be.equal;
-    })
-
-    it("fails delete book because its Not existed ", () => {
-        var deleteResult = book.delete(Number(2));
-        expect(deleteResult).to.equal;
-    });
-
-*/
 
 });
