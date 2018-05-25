@@ -90,27 +90,23 @@ app.get('/add', (req, res, next) => {
 
 // api
 
-app.get('/api/v1/album/:title', (req, res, next) => {
-    let title = req.params.title;
-    console.log(title);
-    Album.findOne({"title": title}, (err, album) => {
+app.get('/api/album/:title', (req, res, next) => {
+  //  let title = req.params.title;
+    console.log("where is the album");
+    Album.findOne({title: req.params.title}, (err, album) => {
         if (err) return next(err);
         res.json(album);
     });
 });
 
 
-app.get('api/v1/albums', (req, res, next) => {
-    Album.find((err, albums) => {
+
+app.get('/api/albums', (req, res, next) => {
+    Album.find({}, (err, albums) => {
         if (err) return next(err);
         res.json(albums);
     });
 });
-
-
-
-
-
 
 
 
