@@ -18,7 +18,8 @@ exports.getCount = () => {
 
 exports.get = (title) => {
     return albums.find((album) => {
-        return album.title.toLowerCase() === title.toLowerCase();
+        return album.title === title;
+       // return album.title.toLowerCase() === title.toLowerCase();
     });
 };
 
@@ -34,19 +35,13 @@ exports.delete = (title) => {
         }
 };
 
-exports.add = (newArtist, newTitle, newLabel) => {
-    let newAlbum = this.get(newArtist, newTitle, newLabel);
-    if (!newAlbum) {
-        albums.push(newArtist, newTitle, newLabel);
-        console.log("New album added");
-        return {
-            artist: newArtist,
-            title: newTitle,
-            label: newLabel
-        };
-    } else {
-        console.log("Album already exists");
+// BW - you're adding an album object, so parameter is not a string
+exports.add = (album) => {
+    if(this.get(album.title)) {
+        console.log("Album already exists. Try again");
         return false;
+    } else {
+        console.log("Your info was added");
+        return albums.push(album);
     }
-    
 };

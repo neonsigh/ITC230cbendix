@@ -1,74 +1,119 @@
-let http = require("http"), fs = require("fs"), qs = require("querystring"); 
-let albums = require("./albums.js");
 'use strict'
 const express = require("express");
 const hbars = require("express-handlebars");
 const app = express();
+const Album = require("./models/Album.js");
+
+
 app.set('port', process.env.PORT || 3000);
 app.engine(".html", hbars({extname: '.html'}));
 app.set("view engine", ".html");
 
 app.use(express.static(__dirname + '/public')); // set location for static files
 app.use(require("body-parser").urlencoded({extended: true})); // parse form submissions
-
-
-app.get('/', (req, res) => {
- res.render('home', { 
-                      albums: albums.getAll 
-             });
+app.use((err, req, res, next) => {
+ console.log(err);
 });
+app.use('/api', require('cors')()); // set Access-Control-Allow-Origin header for api route
 
-app.post('/get', (req, res) => {
-  console.log(req.body); // display parsed form submission
+
+
+app.get('/', (req, res, next) => {
+  Album.find({}, (err, albums) => {
+   if (err) return next(err);
+   res.render('home', {albums: albums});
+  });
 });
-
-app.get('/detail', (req,res) => {
- let found = albums.get(req.query.title);
- res.render('detail', {
-                        title: req.query.title, 
-                        artist: req.query.artist, 
-                        label: req.query.label, 
-                        result: found,
-                        albums: albums.getAll()
-             });
-});
-
-app.post('/detail', (req,res) => {
- let result = albums.get(req.body.title);
- res.render('detail', {
-                        title: req.body.title, 
-                        artist: req.body.artist, 
-                        label: req.body.label, 
-                        result: result 
-             });
-});
-
-
-app.get('/delete', (req,res) => {
- res.type('text/html')
- let result = albums.delete(req.query.title);
- res.render('delete', {
-                        title: req.query.title, 
-                        result: result,
-                        found: res.locals.found,
-                        count: albums.getCount()
-             });
-});
-
+  
 
 app.get('/about', (req, res) => {
- res.type('text/plain');
- res.send('About page');
+    res.type('text/html');
+    res.render('about');
+});
+   
+
+app.get('/detail', (req, res, next) => {
+   Album.findOne({ title: req.query.title }, (err, album) => {
+       if (err) return next(err);
+       res.type('text/html');
+       res.render('detail', {result: album});
+   });
 });
 
 
-app.use( (req,res) => {
- res.type('text/plain'); 
- res.status(404);
- res.send('404 - Not found');
+app.post('/detail', (req, res, next) => {
+    var reqTitle = new RegExp(req.body.title,"i");
+   Album.findOne({ title: reqTitle }, (err, album) => {
+      if (err) return next(err);
+      res.type('text/html');
+      res.render('detail', {result: album});
+   });
 });
+
+
+
+app.get('/delete', (req, res, next) => {
+   Album.remove({ title: req.query.title }, (err, result) => {
+       if (err) return next(err);
+       Album.count((err, total) => {
+           res.type('text/html');
+           res.render('delete', {title: req.query.title, result: result, count: total});
+   });
+});
+});
+
+
+   
+app.get('/add', (req, res) => {
+    res.render('add');
+});
+
+ 
+app.get('/add', (req, res, next) => {
+    let title = req.body.title;
+    Album.update({title: title}, 
+                 {
+                    artist: req.body.artist, 
+                    title: title, 
+                    label: req.body.label
+                 }, 
+                 {upsert: true},
+                 ( (err, result) => {
+                    if(err) return next(err);
+                    res.redirect('/');
+                    })
+                );
+});   
+
+
+
+
+// api
+
+app.get('/api/v1/album/:title', (req, res, next) => {
+    let title = req.params.title;
+    console.log(title);
+    Album.findOne({"title": title}, (err, album) => {
+        if (err) return next(err);
+        res.json(album);
+    });
+});
+
+
+app.get('api/v1/albums', (req, res, next) => {
+    Album.find((err, albums) => {
+        if (err) return next(err);
+        res.json(albums);
+    });
+});
+
+
+
+
+
+
+
 
 app.listen(app.get('port'), () => {
  console.log('Express started'); 
 });
-
